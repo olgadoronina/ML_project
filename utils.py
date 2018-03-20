@@ -15,7 +15,7 @@ def shell_average_2D(spect2D, N_point, k_2d):
     for ind_x, kx in enumerate(k_2d[0]):
         for ind_y, ky in enumerate(k_2d[1]):
                 k_array[i] = round(np.sqrt(kx**2 + ky**2))
-                F_k[i] = 2*np.pi*k_array[i]**2*spect2D[ind_x, ind_y]
+                F_k[i] = np.pi*k_array[i]*spect2D[ind_x, ind_y]
                 i += 1
     all_F_k = sorted(list(zip(k_array, F_k)))
 
@@ -50,15 +50,22 @@ def spectral_density(vel_array, dx, N_points, fname):
     fh.writelines(["%s\n" % item for item in y])
     fh.close()
 
-def sparse_array(data_value, M):
+
+def sparse_array(data_value, M, start):
+
     if data_value.shape[0] % M:
         logging.warning('Error: sparse_dict(): Nonzero remainder')
+
     n_th = int(data_value.shape[0] / M)
-    sparse_data = data_value[::n_th, ::n_th].copy()
+    i = int(start % n_th)
+    j = int(start // n_th)
+    sparse_data = data_value[i::n_th, j::n_th].copy()
     return sparse_data
 
-def sparse_dict(data_dict, M):
+
+def sparse_dict(data_dict, M, start):
+
     sparse = dict()
     for key, value in data_dict.items():
-        sparse[key] = sparse_array(value, M)
+        sparse[key] = sparse_array(value, M, start)
     return sparse
